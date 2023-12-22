@@ -1,0 +1,486 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// Define the maximum number of bills the system can handle
+#define MAX_BILLS 100
+  
+// Structure to represent a power bill
+  struct PowerBill
+{
+  
+int id;
+   
+char name[100];
+   
+int day;
+   
+int month;
+   
+int year;
+   
+float consumption;
+   
+float amount;
+ 
+};
+
+ 
+// Function prototypes
+int addBill (struct PowerBill bills[], int *count);
+
+void viewBills (struct PowerBill bills[], int count);
+
+void updateBill (struct PowerBill bills[], int count);
+
+void deleteBill (struct PowerBill bills[], int *count);
+
+void saveBillsToFile (struct PowerBill bills[], int count);
+
+void loadBillsFromFile (struct PowerBill bills[], int *count);
+
+ 
+int
+main ()
+{
+  
+struct PowerBill bills[MAX_BILLS];
+  
+int billCount = 0;
+  
+int choice;
+  
+ 
+    // Load bill data from file at program start
+    loadBillsFromFile (bills, &billCount);
+  
+ 
+  do
+    {
+      
+	// Display the menu
+	printf ("\n------ Power Bill Management System ------\n");
+      
+printf ("1. Add a new bill\n");
+      
+printf ("2. View a bill\n");
+      
+printf ("3. Update a bill\n");
+      
+printf ("4. Delete a bill\n");
+      
+printf ("5. Save bills to file\n");
+      
+printf ("6. Exit\n");
+      
+printf ("Enter your choice: ");
+      
+if (scanf ("%d", &choice) != 1)
+	{
+	  
+printf ("Invalid input. Please enter a valid number.\n");
+	  
+while (getchar () != '\n');	// Clear the input buffer
+	  continue;
+	
+}
+      
+ 
+switch (choice)
+	{
+	
+case 1:
+	  
+billCount = addBill (bills, &billCount);
+	  
+break;
+	
+case 2:
+	  
+viewBills (bills, billCount);
+	  
+break;
+	
+case 3:
+	  
+updateBill (bills, billCount);
+	  
+break;
+	
+case 4:
+	  
+deleteBill (bills, &billCount);
+	  
+break;
+	
+case 5:
+	  
+saveBillsToFile (bills, billCount);
+	  
+break;
+	
+case 6:
+	  
+printf ("Exiting the program. Goodbye!\n");
+	  
+break;
+	
+default:
+	  
+printf ("Invalid choice. Please try again.\n");
+	
+}
+    
+}
+  while (choice != 6);
+  
+ 
+return 0;
+
+}
+
+
+ 
+int
+addBill (struct PowerBill bills[], int *count)
+{
+  
+if (*count >= MAX_BILLS)
+    {
+      
+printf ("Cannot add more bills. The system is full.\n");
+      
+return *count;
+    
+}
+  
+ 
+    // Assign a systematically generated ID
+  int newId = *count + 1;
+  
+ 
+struct PowerBill newBill;
+  
+newBill.id = newId;
+  
+ 
+printf ("Enter the user's name: ");
+  
+if (scanf ("%99s", newBill.name) != 1)
+    {
+      
+printf ("Invalid input for name. Please enter a valid name.\n");
+      
+while (getchar () != '\n');	// Clear the input buffer
+      return *count;
+    
+}
+  
+ 
+printf ("Enter the date (day month year): ");
+  
+if (scanf ("%d %d %d", &newBill.day, &newBill.month, &newBill.year) != 3)
+    {
+      
+printf
+	("Invalid date format. Please use numbers for day, month, and year.\n");
+      
+while (getchar () != '\n');	// Clear the input buffer
+      return *count;
+    
+}
+  
+ 
+printf ("Enter the consumption (in kWh): ");
+  
+if (scanf ("%f", &newBill.consumption) != 1)
+    {
+      
+printf
+	("Invalid input for consumption. Please enter a valid number.\n");
+      
+while (getchar () != '\n');	// Clear the input buffer
+      return *count;
+    
+}
+  
+ 
+    // Calculate the amount
+    newBill.amount = newBill.consumption * 0.10;	// Assuming a fixed rate
+  
+bills[*count] = newBill;
+  
+(*count)++;
+  
+ 
+printf ("Bill added successfully!\n");
+  
+ 
+return *count;
+
+}
+
+
+ 
+void
+viewBills (struct PowerBill bills[], int count)
+{
+  
+if (count == 0)
+    {
+      
+printf ("No bills found.\n");
+      
+return;
+    
+}
+  
+ 
+int day, month, year;
+  
+printf ("Enter the date (day month year): ");
+  
+if (scanf ("%d %d %d", &day, &month, &year) != 3)
+    {
+      
+printf
+	("Invalid date format. Please use numbers for day, month, and year.\n");
+      
+while (getchar () != '\n');	// Clear the input buffer
+      return;
+    
+}
+  
+ 
+printf ("\n--- Bill Details ---\n");
+  
+printf
+    ("ID | Name             | Date       | Consumption (kWh) | Amount ($)\n");
+  
+printf
+    ("-------------------------------------------------------------------\n");
+  
+ 
+for (int i = 0; i < count; i++)
+    {
+      
+if (bills[i].day == day && bills[i].month == month
+	   && bills[i].year == year)
+	{
+	  
+printf ("%2d | %-16s | %02d/%02d/%d | %16.2f | %10.2f\n",
+		   
+bills[i].id, bills[i].name, bills[i].day, bills[i].month,
+		   bills[i].year, 
+bills[i].consumption, bills[i].amount);
+	
+}
+    
+}
+
+}
+
+
+ 
+void
+updateBill (struct PowerBill bills[], int count)
+{
+  
+if (count == 0)
+    {
+      
+printf ("No bills found. Nothing to update.\n");
+      
+return;
+    
+}
+  
+ 
+int day, month, year;
+  
+printf ("Enter the date (day month year) of the bill to update: ");
+  
+if (scanf ("%d %d %d", &day, &month, &year) != 3)
+    {
+      
+printf
+	("Invalid date format. Please use numbers for day, month, and year.\n");
+      
+while (getchar () != '\n');	// Clear the input buffer
+      return;
+    
+}
+  
+ 
+int found = 0;
+  
+for (int i = 0; i < count; i++)
+    {
+      
+if (bills[i].day == day && bills[i].month == month
+	   && bills[i].year == year)
+	{
+	  
+printf ("Enter the new consumption (in kWh) for the bill: ");
+	  
+if (scanf ("%f", &bills[i].consumption) != 1)
+	    {
+	      
+printf
+		("Invalid input for consumption. Please enter a valid number.\n");
+	      
+while (getchar () != '\n');	// Clear the input buffer
+	      return;
+	    
+}
+	  
+ 
+	    // Recalculate the amount
+	    bills[i].amount = bills[i].consumption * 0.10;	// Assuming a fixed rate
+	  
+printf ("Bill updated successfully!\n");
+	  
+found = 1;
+	  
+break;
+	
+}
+    
+}
+  
+ 
+if (!found)
+    {
+      
+printf ("No bill found for the specified date.\n");
+    
+}
+
+}
+
+
+ 
+void
+deleteBill (struct PowerBill bills[], int *count)
+{
+  
+if (*count == 0)
+    {
+      
+printf ("No bills found. Nothing to delete.\n");
+      
+return;
+    
+}
+  
+ 
+int day, month, year;
+  
+printf ("Enter the date (day month year) of the bill to delete: ");
+  
+if (scanf ("%d %d %d", &day, &month, &year) != 3)
+    {
+      
+printf
+	("Invalid date format. Please use numbers for day, month, and year.\n");
+      
+while (getchar () != '\n');	// Clear the input buffer
+      return;
+    
+}
+  
+ 
+int found = 0;
+  
+for (int i = 0; i < *count; i++)
+    {
+      
+if (bills[i].day == day && bills[i].month == month
+	   && bills[i].year == year)
+	{
+	  
+for (int j = i; j < (*count) - 1; j++)
+	    {
+	      
+bills[j] = bills[j + 1];
+	    
+} 
+ 
+(*count)--;
+	  
+printf ("Bill deleted successfully!\n");
+	  
+found = 1;
+	  
+break;
+	
+}
+    
+}
+  
+ 
+if (!found)
+    {
+      
+printf ("No bill found for the specified date.\n");
+    
+}
+
+}
+
+
+ 
+void
+saveBillsToFile (struct PowerBill bills[], int count)
+{
+  
+FILE * file = fopen ("data.db", "wb");
+  
+if (file == NULL)
+    {
+      
+printf ("Error opening the file for writing.\n");
+      
+return;
+    
+}
+  
+ 
+fwrite (&count, sizeof (int), 1, file);
+  
+fwrite (bills, sizeof (struct PowerBill), count, file);
+  
+ 
+fclose (file);
+  
+printf ("Bills saved to file successfully!\n");
+
+} 
+ 
+void
+
+loadBillsFromFile (struct PowerBill bills[], int *count)
+{
+  
+FILE * file = fopen ("data.db", "rb");
+  
+if (file == NULL)
+    {
+      
+printf ("No existing data file found.\n");
+      
+return;
+    
+}
+  
+ 
+fread (count, sizeof (int), 1, file);
+  
+fread (bills, sizeof (struct PowerBill), *count, file);
+  
+ 
+fclose (file);
+  
+printf ("Bills loaded from file successfully!\n");
+
+} 
